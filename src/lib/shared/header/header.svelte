@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { User } from 'lucide-svelte';
 
 	const listNavigation = [
 		{ name: 'Jadwal Salat', href: '/beranda' },
@@ -32,9 +33,9 @@
 			{#each listNavigation as nav}
 				<a
 					href={nav.href}
-					class={`px-3 py-2 rounded-xl transition-colors duration-150 ${
+					class={`rounded-xl px-3 py-2 transition-colors duration-150 ${
 						page.url.pathname === nav.href
-							? 'bg-brand-50 text-brand-700 ring-1 ring-brand-200 font-semibold'
+							? 'bg-brand-50 font-semibold text-brand-700 ring-1 ring-brand-200'
 							: 'text-slate-800 hover:bg-slate-100'
 					}`}>{nav.name}</a
 				>
@@ -57,10 +58,17 @@
 				<span id="loc">Lampung</span>
 			</button>
 			<a
+				href="/admin/board"
+				class="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-700"
+			>
+				<User size={16} />
+				Login
+			</a>
+			<!-- <a
 				href="#donasi"
 				class="inline-flex items-center gap-2 rounded-xl bg-brand-700 px-4 py-2 text-sm text-white hover:bg-brand-800"
 			>
-				<!-- heart icon -->
+
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					viewBox="0 0 24 24"
@@ -71,7 +79,7 @@
 					/></svg
 				>
 				Donasi
-			</a>
+			</a> -->
 		</div>
 	</div>
 </header>
