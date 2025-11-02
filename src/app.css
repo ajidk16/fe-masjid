@@ -1,0 +1,78 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+
+@theme {
+    --color-brand-50: #ecfdf5;
+    --color-brand-100: #d1fae5;
+    --color-brand-200: #a7f3d0;
+    --color-brand-300: #6ee7b7;
+    --color-brand-400: #34d399;
+    --color-brand-500: #10b981;
+    --color-brand-600: #059669;
+    --color-brand-700: #047857;
+    --color-brand-800: #065f46;
+    --color-brand-900: #064e3b;
+
+    --color-accent-50: #fffbeb;
+    --color-accent-100: #fef3c7;
+    --color-accent-200: #fde68a;
+    --color-accent-300: #fcd34d;
+    --color-accent-400: #fbbf24;
+    --color-accent-500: #f59e0b;
+    --color-accent-600: #d97706;
+    --color-accent-700: #b45309;
+    --color-accent-800: #92400e;
+    --color-accent-900: #78350f;
+
+    --color-gold-50: #fffbeb;
+    --color-gold-100: #fef3c7;
+    --color-gold-200: #fde68a;
+    --color-gold-300: #fcd34d;
+    --color-gold-400: #fbbf24;
+    --color-gold-500: #f59e0b;
+    --color-gold-600: #d97706;
+    --color-gold-700: #b45309;
+    --color-gold-800: #92400e;
+    --color-gold-900: #78350f;
+
+    --color-slate-25: #f8fafc;
+
+    --shadow-soft: 0 8px 24px rgba(2, 6, 23, .06);
+
+
+}
+@layer components {
+    .card {
+        @apply border border-slate-200 rounded-2xl bg-white;
+    }
+
+    .badge {
+        @apply text-xs px-2 py-1 rounded-lg;
+    }
+
+    .badge-role {
+        @apply bg-cyan-50 text-cyan-900 dark:bg-cyan-950 dark:text-cyan-100;
+    }
+
+    .badge-admin {
+        @apply bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-100;
+    }
+
+    .badge-operator {
+        @apply bg-indigo-50 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-200;
+    }
+
+    .badge-jamaah {
+        @apply bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-200;
+    }
+
+    .status-on {
+        @apply bg-green-200 text-green-800 dark:bg-green-950 dark:text-green-300;
+    }
+
+    .status-off {
+        @apply bg-slate-200 text-slate-700 dark:bg-gray-900 dark:text-slate-400;
+    }
+}
