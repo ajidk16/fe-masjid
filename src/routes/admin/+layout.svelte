@@ -273,16 +273,19 @@
 		</div>
 		<nav class="mt-4 space-y-1">
 			{#each listSidebar as item}
-				<a
-					class="flex items-center gap-3 rounded-xl px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 {item.name ===
+				<button
+					class="flex items-center gap-3 rounded-xl w-full px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 {item.name ===
 					'Beranda'
 						? 'bg-brand-50 text-brand-900 dark:bg-slate-800/70'
 						: ''}"
-					href={item.href}
+					onclick={() => {
+						drawerOpen = false;
+						goto(item.href);
+					}}
 				>
 					<item.icon size={20} />
 					{item.name}
-				</a>
+				</button>
 			{/each}
 		</nav>
 	</div>
