@@ -4,6 +4,7 @@
     "": {
       "name": "fe-masjid",
       "dependencies": {
+        "estree-walker": "^3.0.3",
         "lucide-svelte": "^0.552.0",
       },
       "devDependencies": {

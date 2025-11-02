@@ -539,14 +539,14 @@
 				</div>
 				<div class="mt-3 grid gap-3 md:grid-cols-2">
 					<div>
-						<label class="text-xs text-slate-500">Nama</label>
+						<label for="f-name" class="text-xs text-slate-500">Nama</label>
 						<input
 							id="f-name"
 							class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 outline-none focus:ring-2 focus:ring-brand-300 dark:border-slate-800 dark:bg-slate-900 dark:focus:ring-brand-700"
 						/>
 					</div>
 					<div>
-						<label class="text-xs text-slate-500">Email</label>
+						<label for="f-email" class="text-xs text-slate-500">Email</label>
 						<input
 							id="f-email"
 							type="email"
@@ -554,14 +554,14 @@
 						/>
 					</div>
 					<div>
-						<label class="text-xs text-slate-500">Telepon</label>
+						<label for="f-phone" class="text-xs text-slate-500">Telepon</label>
 						<input
 							id="f-phone"
 							class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 outline-none focus:ring-2 dark:border-slate-800 dark:bg-slate-900"
 						/>
 					</div>
 					<div>
-						<label class="text-xs text-slate-500">Status</label>
+						<label for="f-status" class="text-xs text-slate-500">Status</label>
 						<select
 							id="f-status"
 							class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 dark:border-slate-800 dark:bg-slate-900"
@@ -572,7 +572,7 @@
 						</select>
 					</div>
 					<div class="md:col-span-2">
-						<label class="text-xs text-slate-500">Peran</label>
+						<label for="to" class="text-xs text-slate-500">Peran</label>
 						<div class="mt-1 flex flex-wrap gap-2">
 							<button
 								class="role-chip rounded-xl bg-slate-100 px-3 py-1.5 text-sm dark:bg-slate-800"

@@ -159,7 +159,7 @@
 				<div id="kajian" class="card rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
 					<div class="flex items-center justify-between">
 						<h3 class="font-semibold text-slate-800">Agenda & Kajian Pekan Ini</h3>
-						<a href="#" class="text-sm text-brand-700 hover:underline">Lihat semua</a>
+						<a href="/beranda" class="text-sm text-brand-700 hover:underline">Lihat semua</a>
 					</div>
 					<div class="mt-4 grid gap-4 sm:grid-cols-2">
 						<!-- item 1 -->
@@ -274,7 +274,7 @@
 			<div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 				<!-- product card -->
 				<div class="card rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
-					<div class="aspect-[4/3] rounded-xl bg-slate-100"></div>
+					<div class="aspect-4/3 rounded-xl bg-slate-100"></div>
 					<div class="mt-3">
 						<h4 class="font-medium">Kurma Ajwa 500g</h4>
 						<div class="mt-1 flex items-center justify-between text-sm">
@@ -284,7 +284,7 @@
 					</div>
 				</div>
 				<div class="card rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
-					<div class="aspect-[4/3] rounded-xl bg-slate-100"></div>
+					<div class="aspect-4/3 rounded-xl bg-slate-100"></div>
 					<div class="mt-3">
 						<h4 class="font-medium">Sajadah Travel</h4>
 						<div class="mt-1 flex items-center justify-between text-sm">
@@ -294,7 +294,7 @@
 					</div>
 				</div>
 				<div class="card rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
-					<div class="aspect-[4/3] rounded-xl bg-slate-100"></div>
+					<div class="aspect-4/3 rounded-xl bg-slate-100"></div>
 					<div class="mt-3">
 						<h4 class="font-medium">Mukena Katun</h4>
 						<div class="mt-1 flex items-center justify-between text-sm">
@@ -304,7 +304,7 @@
 					</div>
 				</div>
 				<div class="card rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
-					<div class="aspect-[4/3] rounded-xl bg-slate-100"></div>
+					<div class="aspect-4/3 rounded-xl bg-slate-100"></div>
 					<div class="mt-3">
 						<h4 class="font-medium">Pecel Lele Jumat</h4>
 						<div class="mt-1 flex items-center justify-between text-sm">
