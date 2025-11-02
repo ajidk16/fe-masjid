@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { Clock, FileText, LayoutDashboard, Menu, Plus, Users, X } from 'lucide-svelte';
 
@@ -64,7 +65,11 @@
 	<aside
 		class="sticky top-0 hidden h-screen border-r border-slate-200 bg-white/90 backdrop-blur lg:block dark:border-slate-800 dark:bg-slate-900/80"
 	>
-		<div class="flex h-16 items-center gap-2 border-b border-slate-200 px-5 dark:border-slate-800">
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<a
+			href="/beranda"
+			class="flex h-16 items-center gap-2 border-b border-slate-200 px-5 dark:border-slate-800"
+		>
 			<div class="grid size-9 place-items-center rounded-xl bg-brand-900 font-bold text-white">
 				م
 			</div>
@@ -72,7 +77,7 @@
 				<p class="font-semibold">Masjid Digital</p>
 				<p class="text-xs text-slate-500">Dashboard Takmir</p>
 			</div>
-		</div>
+		</a>
 		<nav class="space-y-1 p-3">
 			{#each listSidebar as item}
 				<a
