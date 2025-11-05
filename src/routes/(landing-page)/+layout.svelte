@@ -55,7 +55,7 @@
 					<span id="loc">Lampung</span>
 				</button>
 				<a
-					href="/admin/board"
+					href="/auth/sign-in"
 					class="hidden items-center gap-2 rounded-xl bg-brand-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-700 md:inline-flex"
 				>
 					<User size={16} />
