@@ -76,15 +76,15 @@
 				Buat akun baru untuk menjadi bagian dari ekosistem digital masjid.
 			</p>
 
-			<form id="form" novalidate class="mt-6 space-y-4">
+			<form id="form" method="POST" novalidate class="mt-6 space-y-4">
 				<!-- Nama -->
 				<div>
-					<label for="name" class="block text-sm font-medium text-slate-700 dark:text-slate-300"
+					<label for="fullName" class="block text-sm font-medium text-slate-700 dark:text-slate-300"
 						>Nama Lengkap</label
 					>
 					<input
-						id="name"
-						name="name"
+						id="fullName"
+						name="fullName"
 						autocomplete="name"
 						required
 						class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[15px]

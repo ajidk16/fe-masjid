@@ -1,14 +1,18 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
+	import { Loader } from 'lucide-svelte';
 
 	let showPassword = $state(false);
+	let infoMessage = $state('');
+	let loading = $state(false);
 </script>
 
 <main class="grid min-h-dvh lg:grid-cols-2">
 	<section class="flex items-center justify-center p-6 sm:p-10">
 		<div class="w-full max-w-md">
 			<!-- Brand -->
-			<button onclick={() => goto('/')} class="mb-6 flex items-left gap-3 cursor-pointer">
+			<button onclick={() => goto('/')} class="items-left mb-6 flex cursor-pointer gap-3">
 				<div class="grid size-10 place-items-center rounded-xl bg-brand-900 font-bold text-white">
 					م
 				</div>
@@ -28,12 +32,30 @@
 				<!-- Alert (contoh error; sembunyikan jika tidak perlu) -->
 				<div
 					id="alert"
-					class="mt-4 hidden rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+					class="mt-4 {infoMessage
+						? ''
+						: 'hidden'} rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
 				>
-					Email atau kata sandi salah.
+					{infoMessage}
 				</div>
 
-				<form class="mt-5 space-y-4" action="#" method="post" novalidate>
+				<form
+					class="mt-5 space-y-4"
+					use:enhance={() => {
+						loading = true;
+						return async ({ result }) => {
+							setTimeout(() => {
+								if (result.status === 200) {
+									goto('/admin/board');
+								} else {
+									infoMessage = 'Email atau kata sandi salah.';
+								}
+								loading = false;
+							}, 500);
+						};
+					}}
+					method="POST"
+				>
 					<div>
 						<label for="email" class="mb-1 block text-sm font-medium">Email</label>
 						<input
@@ -52,7 +74,7 @@
 								id="password"
 								name="password"
 								type={showPassword ? 'text' : 'password'}
-								placeholder="••••••••"
+								placeholder="Masukkan kata sandi Anda"
 								autocomplete="current-password"
 								required
 								class="w-full rounded-xl border border-gray-300/80 bg-white px-3.5 py-2.5 pr-11 text-sm ring-2 ring-transparent outline-none focus:border-brand-500 focus:ring-brand-200 dark:border-white/10 dark:bg-gray-900 dark:focus:ring-brand-800"
@@ -75,16 +97,26 @@
 							<input type="checkbox" class="size-4 rounded border-slate-300" name="remember" />
 							Ingat saya
 						</label>
-						<a href="/forgot-password" class="text-sm text-brand-700 hover:underline"
+						<a href="/auth/forgot-password" class="text-sm text-brand-700 hover:underline"
 							>Lupa kata sandi?</a
 						>
 					</div>
 
 					<button
 						type="submit"
-						class="w-full rounded-xl bg-brand-600 py-2.5 text-white hover:bg-brand-700"
+						class="w-full rounded-xl {loading
+							? 'cursor-not-allowed bg-gray-400 text-gray-200 hover:bg-gray-400'
+							: 'bg-brand-600 hover:bg-brand-700'} py-2.5 text-white transition-colors"
+						disabled={loading}
 					>
-						Masuk
+						{#if loading}
+							<span class="inline-flex items-center gap-2">
+								<Loader size={16} />
+								Memproses...
+							</span>
+						{:else}
+							Masuk
+						{/if}
 					</button>
 
 					<div class="flex items-center gap-3 text-xs text-slate-500">

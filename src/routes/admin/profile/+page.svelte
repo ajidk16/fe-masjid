@@ -1,3 +1,8 @@
+<script lang="ts">
+	let { data } = $props();
+	const profile = $derived(data.profile);
+</script>
+
 <main class="thin space-y-6 p-4 lg:p-6">
 	<!-- Header Profile -->
 	<section class="card p-4">
@@ -52,7 +57,7 @@
 			<div class="mt-4 grid gap-4 md:grid-cols-2">
 				<div>
 					<p class="muted text-xs">Nama Lengkap</p>
-					<p class="font-medium">Ahmad Fauzi</p>
+					<p class="font-medium">{profile.data.fullName}</p>
 				</div>
 				<div>
 					<p class="muted text-xs">Username</p>
@@ -60,11 +65,11 @@
 				</div>
 				<div>
 					<p class="muted text-xs">Email</p>
-					<p class="font-medium">admin@masjid.id</p>
+					<p class="font-medium">{profile.data.email}</p>
 				</div>
 				<div>
 					<p class="muted text-xs">Telepon</p>
-					<p class="font-medium">+62 812-0000-0000</p>
+					<p class="font-medium">{profile.data.phone}</p>
 				</div>
 				<div>
 					<p class="muted text-xs">Alamat</p>

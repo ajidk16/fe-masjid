@@ -1,17 +1,35 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
+	import { cn } from '$lib/utils/cn.js';
+	import { formatDate, formatDateTime } from '$lib/utils/format.js';
 	import { X } from 'lucide-svelte';
 
-	const roleColors = {
-		Superadmin: 'bg-slate-900 text-white',
-		Takmir: 'bg-brand-600 text-white',
-		Bendahara: 'bg-gold-500 text-white',
-		Relawan: 'bg-slate-300 text-slate-900',
-		Jamaah: 'bg-slate-100 dark:bg-slate-800'
+	type Permission = {
+		id: string;
+		moduleId: string;
+		roleId: string;
+		canRead: boolean;
+		canCreate: boolean;
+		canUpdate: boolean;
+		canDelete: boolean;
+		canManage: boolean;
+		module: {
+			name: string;
+		};
+	};
+
+	type Role = {
+		code: string;
+		description: string;
+		memberCount: number;
+		permission: Permission[];
 	};
 
 	let activeTab = $state('users');
 	let modalUser = $state(false);
 	let modalRole = $state(false);
+	let selectedRoles: Role = $state({} as Role);
+	let loading = $state(false);
 
 	const modules = [
 		'Donasi',
@@ -23,88 +41,14 @@
 		'Pengguna'
 	];
 
-	const users = [
-		{
-			id: 1,
-			name: 'Ahmad Fauzi',
-			email: 'ahmad@masjid.id',
-			roles: ['Takmir'],
-			status: 'Aktif',
-			last: '01 Nov 2025 09:12'
-		},
-		{
-			id: 2,
-			name: 'Nur Aisyah',
-			email: 'aisyah@masjid.id',
-			roles: ['Bendahara', 'Takmir'],
-			status: 'Aktif',
-			last: '31 Okt 2025 20:11'
-		},
-		{
-			id: 3,
-			name: 'Hamba Allah',
-			email: '- privat -',
-			roles: ['Jamaah'],
-			status: 'Menunggu',
-			last: '31 Okt 2025 07:58'
-		},
-		{
-			id: 4,
-			name: 'Budi Santoso',
-			email: 'budi@masjid.id',
-			roles: ['Relawan'],
-			status: 'Nonaktif',
-			last: '29 Okt 2025 14:22'
-		},
-		{
-			id: 5,
-			name: 'Siti Rahma',
-			email: 'siti@masjid.id',
-			roles: ['Superadmin'],
-			status: 'Aktif',
-			last: '01 Nov 2025 06:05'
-		},
-		{
-			id: 6,
-			name: 'Rizky Putra',
-			email: 'rizky@masjid.id',
-			roles: ['Jamaah', 'Relawan'],
-			status: 'Aktif',
-			last: '28 Okt 2025 19:40'
-		},
-		{
-			id: 7,
-			name: 'Hasan',
-			email: 'hasan@masjid.id',
-			roles: ['Takmir'],
-			status: 'Aktif',
-			last: '28 Okt 2025 09:10'
-		},
-		{
-			id: 8,
-			name: 'Nadia',
-			email: 'nadia@masjid.id',
-			roles: ['Jamaah'],
-			status: 'Menunggu',
-			last: '27 Okt 2025 21:00'
-		},
-		{
-			id: 9,
-			name: 'Farhan',
-			email: 'farhan@masjid.id',
-			roles: ['Relawan'],
-			status: 'Aktif',
-			last: '27 Okt 2025 08:33'
-		},
-		{
-			id: 10,
-			name: 'Zahra',
-			email: 'zahra@masjid.id',
-			roles: ['Bendahara'],
-			status: 'Aktif',
-			last: '26 Okt 2025 16:05'
-		}
-	];
+	const { data } = $props();
+	const members = $derived(data.members);
+	const roles = $derived(data.roles);
+
+	const handleEdit = (role: Role) => {
+		modalRole = true;
+		selectedRoles = role;
+	};
 </script>
 
 <main class="space-y-6 p-4 lg:p-6">
@@ -263,161 +207,58 @@
 								</tr>
 							</thead>
 							<tbody id="tbody">
-								<!-- Row -->
-								<tr class="border-t border-slate-100 dark:border-slate-800">
-									<td class="p-3"><input type="checkbox" class="rowcheck size-4" /></td>
-									<td class="p-3">
-										<div class="flex items-center gap-3">
-											<div
-												class="grid size-9 place-items-center rounded-xl bg-brand-900 text-xs text-white"
-											>
-												AF
+								{#each members.data as member}
+									<tr class="border-t border-slate-100 dark:border-slate-800">
+										<td class="p-3 text-center"
+											><input type="checkbox" class="rowcheck size-4" /></td
+										>
+										<td class="p-3 text-center">
+											<div class="flex items-center gap-3">
+												<div
+													class="grid size-9 place-items-center rounded-xl bg-brand-900 text-xs text-white"
+												>
+													{member.fullName.toUpperCase().slice(0, 2)}
+												</div>
+												<div>
+													<p class="font-medium capitalize">{member.fullName}</p>
+													<p class="text-xs text-slate-500">Takmir</p>
+												</div>
 											</div>
-											<div>
-												<p class="font-medium">Ahmad Fauzi</p>
-												<p class="text-xs text-slate-500">Takmir</p>
+										</td>
+										<td class="p-3 text-center">{member.user.email}</td>
+										<td class="p-3 text-center">
+											<span
+												class={cn(
+													'badge',
+													member?.role?.code == 'admin' && 'badge-admin',
+													member?.role?.code == 'operator' && 'badge-operator',
+													member?.role?.code == 'jamaah' && 'badge-jamaah',
+													member?.role?.code == 'relawan' && 'badge-relawan',
+													member?.role?.code == null && 'badge-unknown'
+												)}>{member?.role ? member.role.label : 'Unknown'}</span
+											>
+										</td>
+										<td class="p-3 text-center"
+											><span
+												class={cn('badge', member.user.verifiedEmail ? 'status-on' : 'status-off')}
+												>{member.user.verifiedEmail ? 'Aktif' : 'Tidak Aktif'}</span
+											></td
+										>
+										<td class="p-3 text-center">{formatDateTime(member.user.createdAt)}</td>
+										<td class="p-3 text-center">
+											<div class="flex justify-end gap-2">
+												<button
+													class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-800"
+													data-edit>Ubah</button
+												>
+												<button
+													class="rounded-lg bg-red-600 px-2 py-1 text-white hover:bg-red-700"
+													data-del>Hapus</button
+												>
 											</div>
-										</div>
-									</td>
-									<td class="p-3">ahmad@masjid.id</td>
-									<td class="p-3">
-										<span class="badge badge-admin">Admin</span>
-									</td>
-									<td class="p-3"><span class="badge status-on">Aktif</span></td>
-									<td class="p-3">02 Nov 2025 • 09:50</td>
-									<td class="p-3">
-										<div class="flex justify-end gap-2">
-											<button class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-800" data-edit
-												>Ubah</button
-											>
-											<button
-												class="rounded-lg bg-red-600 px-2 py-1 text-white hover:bg-red-700"
-												data-del>Hapus</button
-											>
-										</div>
-									</td>
-								</tr>
-								<!-- Row -->
-								<tr class="border-t border-slate-100 dark:border-slate-800">
-									<td class="p-3"><input type="checkbox" class="rowcheck size-4" /></td>
-									<td class="p-3">
-										<div class="flex items-center gap-3">
-											<div
-												class="grid size-9 place-items-center rounded-xl bg-gold-500 text-xs text-white"
-											>
-												NA
-											</div>
-											<div>
-												<p class="font-medium">Nur Aisyah</p>
-												<p class="text-xs text-slate-500">Operator</p>
-											</div>
-										</div>
-									</td>
-									<td class="p-3">nur@masjid.id</td>
-									<td class="p-3"><span class="badge badge-operator">Operator</span></td>
-									<td class="p-3"><span class="badge status-on">Aktif</span></td>
-									<td class="p-3">01 Nov 2025 • 21:15</td>
-									<td class="p-3">
-										<div class="flex justify-end gap-2">
-											<button class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-800" data-edit
-												>Ubah</button
-											>
-											<button class="rounded-lg bg-red-600 px-2 py-1 text-white" data-del
-												>Hapus</button
-											>
-										</div>
-									</td>
-								</tr>
-								<!-- Row -->
-								<tr class="border-t border-slate-100 dark:border-slate-800">
-									<td class="p-3"><input type="checkbox" class="rowcheck size-4" /></td>
-									<td class="p-3">
-										<div class="flex items-center gap-3">
-											<div
-												class="grid size-9 place-items-center rounded-xl bg-slate-400 text-xs text-white"
-											>
-												HS
-											</div>
-											<div>
-												<p class="font-medium">Hamba Allah</p>
-												<p class="text-xs text-slate-500">Jamaah</p>
-											</div>
-										</div>
-									</td>
-									<td class="p-3">hamba@contoh.id</td>
-									<td class="p-3"><span class="badge badge-jamaah">Jamaah</span></td>
-									<td class="p-3"><span class="badge status-off">Nonaktif</span></td>
-									<td class="p-3">29 Okt 2025 • 08:02</td>
-									<td class="p-3">
-										<div class="flex justify-end gap-2">
-											<button class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-800" data-edit
-												>Ubah</button
-											>
-											<button class="rounded-lg bg-red-600 px-2 py-1 text-white" data-del
-												>Hapus</button
-											>
-										</div>
-									</td>
-								</tr>
-								<!-- Tambah beberapa contoh lagi -->
-								<tr class="border-t border-slate-100 dark:border-slate-800">
-									<td class="p-3"><input type="checkbox" class="rowcheck size-4" /></td>
-									<td class="p-3"
-										><div class="flex items-center gap-3">
-											<div
-												class="grid size-9 place-items-center rounded-xl bg-brand-700 text-xs text-white"
-											>
-												BS
-											</div>
-											<div>
-												<p class="font-medium">Budi Santoso</p>
-												<p class="text-xs text-slate-500">Jamaah</p>
-											</div>
-										</div></td
-									>
-									<td class="p-3">budi@masjid.id</td>
-									<td class="p-3"><span class="badge badge-jamaah">Jamaah</span></td>
-									<td class="p-3"><span class="badge status-on">Aktif</span></td>
-									<td class="p-3">28 Okt 2025 • 12:41</td>
-									<td class="p-3"
-										><div class="flex justify-end gap-2">
-											<button class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-800" data-edit
-												>Ubah</button
-											><button class="rounded-lg bg-red-600 px-2 py-1 text-white" data-del
-												>Hapus</button
-											>
-										</div></td
-									>
-								</tr>
-								<tr class="border-t border-slate-100 dark:border-slate-800">
-									<td class="p-3"><input type="checkbox" class="rowcheck size-4" /></td>
-									<td class="p-3"
-										><div class="flex items-center gap-3">
-											<div
-												class="grid size-9 place-items-center rounded-xl bg-brand-500 text-xs text-white"
-											>
-												TK
-											</div>
-											<div>
-												<p class="font-medium">Takmir Kecil</p>
-												<p class="text-xs text-slate-500">Operator</p>
-											</div>
-										</div></td
-									>
-									<td class="p-3">op@masjid.id</td>
-									<td class="p-3"><span class="badge badge-operator">Operator</span></td>
-									<td class="p-3"><span class="badge status-on">Aktif</span></td>
-									<td class="p-3">27 Okt 2025 • 17:18</td>
-									<td class="p-3"
-										><div class="flex justify-end gap-2">
-											<button class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-800" data-edit
-												>Ubah</button
-											><button class="rounded-lg bg-red-600 px-2 py-1 text-white" data-del
-												>Hapus</button
-											>
-										</div></td
-									>
-								</tr>
+										</td>
+									</tr>
+								{/each}
 							</tbody>
 						</table>
 					</div>
@@ -445,76 +286,36 @@
 			>
 				<div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
 					<!-- sample role card -->
-					<div class="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
-						<div class="flex items-start justify-between">
-							<div>
-								<p class="font-medium">Superadmin</p>
-								<p class="text-xs text-slate-500">Akses penuh semua modul</p>
+					{#each roles.data as role}
+						<div class="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
+							<div class="flex items-start justify-between">
+								<div>
+									<p class="font-medium capitalize">{role.code}</p>
+									<p class="text-xs text-slate-500">{role.description}</p>
+								</div>
+								<span class="rounded-lg bg-brand-50 px-2 py-0.5 text-xs text-brand-900"
+									>{role.memberCount} user</span
+								>
 							</div>
-							<span class="rounded-lg bg-brand-50 px-2 py-0.5 text-xs text-brand-900">4 user</span>
-						</div>
-						<div class="mt-3 flex flex-wrap gap-1 text-xs">
-							<span class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-800">Baca</span>
-							<span class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-800">Buat</span>
-							<span class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-800">Ubah</span>
-							<span class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-800">Hapus</span>
-							<span class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-800">Kelola</span>
-						</div>
-						<div class="mt-4 flex gap-2">
-							<button class="rounded-xl bg-slate-100 px-3 py-2 text-sm dark:bg-slate-800"
-								>Edit Izin</button
-							>
-							<button class="rounded-xl bg-slate-100 px-3 py-2 text-sm dark:bg-slate-800"
-								>Duplikat</button
-							>
-						</div>
-					</div>
-
-					<div class="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
-						<div class="flex items-start justify-between">
-							<div>
-								<p class="font-medium">Takmir</p>
-								<p class="text-xs text-slate-500">Kelola jadwal dan konten</p>
+							<div class="mt-3 flex flex-wrap gap-1 text-xs">
+								<span class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-800">Baca</span>
+								<span class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-800">Buat</span>
+								<span class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-800">Ubah</span>
+								<span class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-800">Hapus</span>
+								<span class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-800">Kelola</span>
 							</div>
-							<span class="rounded-lg bg-brand-50 px-2 py-0.5 text-xs text-brand-900">7 user</span>
-						</div>
-						<div class="mt-3 flex flex-wrap gap-1 text-xs">
-							<span class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-800">Baca</span>
-							<span class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-800">Buat</span>
-							<span class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-800">Ubah</span>
-						</div>
-						<div class="mt-4 flex gap-2">
-							<button class="rounded-xl bg-slate-100 px-3 py-2 text-sm dark:bg-slate-800"
-								>Edit Izin</button
-							>
-							<button class="rounded-xl bg-slate-100 px-3 py-2 text-sm dark:bg-slate-800"
-								>Duplikat</button
-							>
-						</div>
-					</div>
-
-					<div class="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
-						<div class="flex items-start justify-between">
-							<div>
-								<p class="font-medium">Bendahara</p>
-								<p class="text-xs text-slate-500">Transaksi dan laporan</p>
+							<div class="mt-4 flex gap-2">
+								<button
+									class="cursor-pointer rounded-xl bg-slate-100 px-3 py-2 text-sm dark:bg-slate-800"
+									onclick={() => handleEdit(role)}>Edit Izin</button
+								>
+								<button
+									class="cursor-pointer rounded-xl bg-slate-100 px-3 py-2 text-sm dark:bg-slate-800"
+									>Duplikat</button
+								>
 							</div>
-							<span class="rounded-lg bg-brand-50 px-2 py-0.5 text-xs text-brand-900">3 user</span>
 						</div>
-						<div class="mt-3 flex flex-wrap gap-1 text-xs">
-							<span class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-800">Baca</span>
-							<span class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-800">Buat</span>
-							<span class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-800">Ubah</span>
-						</div>
-						<div class="mt-4 flex gap-2">
-							<button class="rounded-xl bg-slate-100 px-3 py-2 text-sm dark:bg-slate-800"
-								>Edit Izin</button
-							>
-							<button class="rounded-xl bg-slate-100 px-3 py-2 text-sm dark:bg-slate-800"
-								>Duplikat</button
-							>
-						</div>
-					</div>
+					{/each}
 				</div>
 			</div>
 		{/if}
@@ -612,13 +413,29 @@
 
 {#if modalRole}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-		<div class="w-full max-w-xl rounded-2xl">
+		<form
+			class="w-full max-w-xl rounded-2xl"
+			method="POST"
+			use:enhance={() => {
+				return async ({ result }) => {
+					loading = true;
+
+					if (result.status === 200) {
+						modalRole = false;
+						loading = false;
+					}
+				};
+			}}
+			action="?/updateRoles"
+		>
 			<div class="absolute inset-0 bg-black/40"></div>
 			<div
 				class="relative rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
 			>
 				<div class="flex items-center justify-between">
-					<p class="font-medium">Izin Peran: <span id="perm-role">Peran</span></p>
+					<p class="font-medium capitalize">
+						Izin Peran: <span id="perm-role">{selectedRoles.code}</span>
+					</p>
 					<button
 						onclick={() => (modalRole = false)}
 						class="rounded-lg p-2 hover:bg-slate-100 dark:hover:bg-slate-800"
@@ -626,7 +443,8 @@
 						<X size={24} />
 					</button>
 				</div>
-				<div class="thin-scrollbar mt-3 overflow-x-auto">
+
+				<div class="thin-scrollbar mt-3 h-[70svh] overflow-x-auto overflow-y-auto">
 					<table class="w-full text-sm">
 						<thead class="bg-slate-50 dark:bg-slate-950/40">
 							<tr>
@@ -640,45 +458,115 @@
 							</tr>
 						</thead>
 						<tbody id="perm-body">
-							{#each modules as m, i}
+							{#each selectedRoles.permission as m, i}
 								<tr class="border-t border-slate-100 dark:border-slate-800">
-									<td class="p-3 font-medium">{m}</td>
-									<td class="p-3">
-										<input type="checkbox" class="perm-read" data-row={i} />
+									<td class="p-3 font-medium capitalize">{m.module.name.replace('-', ' ')}</td>
+									<td class="p-3 text-center">
+										<div>
+											<input type="hidden" name="id" value={m.id} />
+											<input type="hidden" name={'moduleId'} value={m.moduleId} />
+
+											<input type="hidden" name={'roleId'} value={m.roleId} />
+											<input
+												type="checkbox"
+												class="perm-read"
+												name={'canRead'}
+												checked={m.canRead}
+												onchange={() => (m.canRead = !m.canRead)}
+											/>
+										</div>
 									</td>
-									<td class="p-3">
-										<input type="checkbox" class="perm-create" data-row={i} />
+									<td class="p-3 text-center">
+										<input
+											type="checkbox"
+											class="perm-create"
+											name={'canCreate'}
+											checked={m.canCreate}
+											onchange={() => (m.canCreate = !m.canCreate)}
+										/>
 									</td>
-									<td class="p-3">
-										<input type="checkbox" class="perm-update" data-row={i} />
+									<td class="p-3 text-center">
+										<input
+											type="checkbox"
+											class="perm-update"
+											name={'canUpdate'}
+											checked={m.canUpdate}
+											onchange={() => (m.canUpdate = !m.canUpdate)}
+										/>
 									</td>
-									<td class="p-3">
-										<input type="checkbox" class="perm-delete" data-row={i} />
+									<td class="p-3 text-center">
+										<input
+											type="checkbox"
+											class="perm-delete"
+											name={'canDelete'}
+											checked={m.canDelete}
+											onchange={() => (m.canDelete = !m.canDelete)}
+										/>
 									</td>
-									<td class="p-3">
-										<input type="checkbox" class="perm-manage" data-row={i} />
+									<td class="p-3 text-center">
+										<input
+											type="checkbox"
+											class="perm-manage"
+											name={'canManage'}
+											checked={m.canManage}
+											onchange={() => (m.canManage = !m.canManage)}
+										/>
 									</td>
-									<td class="p-3">
-										<button class="rounded-lg bg-slate-100 px-2 py-1 text-xs dark:bg-slate-800"
-											>Semua</button
-										>
-										<button class="ml-1 rounded-lg bg-slate-100 px-2 py-1 text-xs dark:bg-slate-800"
-											>Kosong</button
-										>
+									<td class="p-3 text-center">
+										<!-- <input
+											type="checkbox"
+											class="perm-all"
+											checked={m.canRead &&
+												m.canCreate &&
+												m.canUpdate &&
+												m.canDelete &&
+												m.canManage}
+											onchange={() => {
+												const allChecked =
+													m.canRead && m.canCreate && m.canUpdate && m.canDelete && m.canManage;
+												m.canRead = !allChecked;
+												m.canCreate = !allChecked;
+												m.canUpdate = !allChecked;
+												m.canDelete = !allChecked;
+												m.canManage = !allChecked;
+											}}
+										/> -->
+										{#if m.canRead && m.canCreate && m.canUpdate && m.canDelete && m.canManage}
+											<button
+												onclick={() => {
+													m.canRead = false;
+													m.canCreate = false;
+													m.canUpdate = false;
+													m.canDelete = false;
+													m.canManage = false;
+												}}>❌</button
+											>
+										{:else}
+											<button
+												onclick={() => {
+													m.canRead = true;
+													m.canCreate = true;
+													m.canUpdate = true;
+													m.canDelete = true;
+													m.canManage = true;
+												}}>✅</button
+											>
+										{/if}
 									</td>
 								</tr>
 							{/each}
 						</tbody>
 					</table>
 				</div>
+
 				<div class="mt-4 flex justify-end gap-2">
 					<button
 						onclick={() => (modalRole = false)}
 						class="rounded-xl bg-slate-100 px-3 py-2 dark:bg-slate-800">Tutup</button
 					>
-					<button class="rounded-xl bg-brand-600 px-3 py-2 text-white">Simpan</button>
+					<button type="submit" class="rounded-xl bg-brand-600 px-3 py-2 text-white">Simpan</button>
 				</div>
 			</div>
-		</div>
+		</form>
 	</div>
 {/if}

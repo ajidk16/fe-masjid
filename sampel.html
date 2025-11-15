@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reset Password — Masjid Digital</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#f0fdf4',100:'#dcfce7',200:'#bbf7d0',300:'#86efac',400:'#4ade80',500:'#22c55e',600:'#16a34a',700:'#15803d',800:'#166534',900:'#14532d' },
+            gold:  { 50:'#fefce8',100:'#fef9c3',200:'#fef08a',300:'#fde047',400:'#facc15',500:'#eab308',600:'#ca8a04',700:'#a16207',800:'#854d0e',900:'#713f12' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+  <div class="min-h-dvh flex flex-col items-center justify-center px-4">
+    <!-- Card -->
+    <div class="w-full max-w-md rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-md p-6 space-y-6">
+      <!-- Header -->
+      <div class="text-center space-y-2">
+        <div class="mx-auto w-14 h-14 rounded-2xl bg-brand-900 text-white grid place-items-center text-2xl font-bold">م</div>
+        <h1 class="text-xl font-semibold">Atur Ulang Kata Sandi</h1>
+        <p class="text-sm text-slate-500">Masukkan kata sandi baru untuk akun Anda</p>
+      </div>
+
+      <!-- Form -->
+      <form class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-600 dark:text-slate-300">Kata Sandi Baru</label>
+          <input type="password" placeholder="••••••••" class="mt-1 w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-brand-300 dark:focus:ring-brand-700 outline-none">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-600 dark:text-slate-300">Ulangi Kata Sandi</label>
+          <input type="password" placeholder="••••••••" class="mt-1 w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-brand-300 dark:focus:ring-brand-700 outline-none">
+        </div>
+
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-medium transition">
+          Simpan Kata Sandi
+        </button>
+      </form>
+
+      <!-- Info -->
+      <div class="text-center text-sm text-slate-500">
+        <p>Sudah ingat kata sandi?</p>
+        <a href="/login" class="text-brand-700 hover:underline font-medium">Kembali ke Login</a>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <p class="mt-8 text-xs text-slate-400">© 2025 Masjid Digital • Aman dan Halal</p>
+  </div>
+
+  <!-- Optional dark mode toggle -->
+  <button id="toggle" class="fixed bottom-4 right-4 p-2 rounded-xl bg-slate-200 dark:bg-slate-800">
+    <svg class="size-5 block dark:hidden" viewBox="0 0 24 24" fill="none">
+      <path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M3 12h2M19 12h2" stroke="currentColor" stroke-width="2"/>
+      <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/>
+    </svg>
+    <svg class="size-5 hidden dark:block" viewBox="0 0 24 24" fill="none">
+      <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2"/>
+    </svg>
+  </button>
+
+  <script>
+    const root=document.documentElement;
+    const btn=document.getElementById('toggle');
+    btn.addEventListener('click',()=>{root.classList.toggle('dark');});
+  </script>
+</body>
+</html>

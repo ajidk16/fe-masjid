@@ -1,9 +1,12 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import { cn } from '$lib/utils/cn.js';
 	import { Clock, FileText, LayoutDashboard, Menu, Plus, Users, X } from 'lucide-svelte';
 
-	let { children } = $props();
+	let { children, data } = $props();
+	const profile = $derived(JSON.parse(data.profile || ''));
 
 	let drawerOpen = $state(false);
 	let userMenuOpen = $state(false);
@@ -42,7 +45,8 @@
 		{
 			name: 'Pengguna',
 			href: '/admin/users',
-			icon: Users
+			icon: Users,
+			role: 'admin'
 		}
 	];
 
@@ -81,10 +85,13 @@
 		<nav class="space-y-1 p-3">
 			{#each listSidebar as item}
 				<a
-					class="flex items-center gap-3 rounded-xl px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 {page
-						.url.pathname === item.href
-						? 'bg-brand-50 text-brand-900 dark:bg-slate-800/70'
-						: ''}"
+					class={cn(
+						'flex items-center gap-3 rounded-xl px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800',
+						item.name === breadcrumb.title ? 'bg-brand-50 text-brand-900 dark:bg-slate-800/70' : '',
+						item.role && profile.role.code !== 'admin' && profile.role.code !== item.role
+							? 'hidden'
+							: ''
+					)}
 					href={item.href}
 				>
 					<item.icon size={20} />
@@ -172,11 +179,11 @@
 						<div
 							class="grid size-9 place-items-center rounded-xl bg-brand-900 font-semibold text-white"
 						>
-							TK
+							{profile.fullName.toUpperCase().slice(0, 2) ?? '--'}
 						</div>
 						<div class="hidden md:block">
-							<p class="text-sm leading-tight font-medium">Takmir</p>
-							<p class="text-xs text-slate-500">admin@masjid.id</p>
+							<p class="text-sm leading-tight font-medium">{profile.fullName}</p>
+							<p class="text-xs text-slate-500">{profile.user.email}</p>
 						</div>
 						<svg
 							class="size-4 text-slate-400 transition-transform {userMenuOpen ? 'rotate-180' : ''}"
@@ -221,19 +228,22 @@
 								Pengaturan
 							</a>
 							<div class="my-1 h-px bg-slate-200 dark:bg-slate-800"></div>
-							<button
-								class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20"
-							>
-								<svg class="size-4" viewBox="0 0 24 24" fill="none">
-									<path
-										d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4m7 14l5-5-5-5m5 5H9"
-										stroke="currentColor"
-										stroke-width="2"
-										stroke-linecap="round"
-									/>
-								</svg>
-								Keluar
-							</button>
+							<form action="/auth/logout?/logout" method="POST" use:enhance>
+								<button
+									type="submit"
+									class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20"
+								>
+									<svg class="size-4" viewBox="0 0 24 24" fill="none">
+										<path
+											d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4m7 14l5-5-5-5m5 5H9"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+										/>
+									</svg>
+									Keluar
+								</button>
+							</form>
 						</div>
 					{/if}
 				</div>
@@ -274,7 +284,7 @@
 		<nav class="mt-4 space-y-1">
 			{#each listSidebar as item}
 				<button
-					class="flex items-center gap-3 rounded-xl w-full px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 {item.name ===
+					class="flex w-full items-center gap-3 rounded-xl px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 {item.name ===
 					'Beranda'
 						? 'bg-brand-50 text-brand-900 dark:bg-slate-800/70'
 						: ''}"
