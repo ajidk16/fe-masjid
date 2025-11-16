@@ -26,7 +26,7 @@ export const load = async ({ url, cookies }) => {
 };
 
 export const actions = {
-	updateRoles: async ({ request, cookies }) => {
+	updatePermission: async ({ request, cookies }) => {
 		const formData = await request.formData();
 
 		// Extract all moduleId, roleId, and permission values from form data

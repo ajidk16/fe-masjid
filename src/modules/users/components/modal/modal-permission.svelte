@@ -26,7 +26,7 @@
 					closeDrawer();
 				}, 500);
 			}}
-			action="?/updateRoles"
+			action="?/updatePermission"
 		>
 			<div class="absolute inset-0 bg-black/40"></div>
 			<div

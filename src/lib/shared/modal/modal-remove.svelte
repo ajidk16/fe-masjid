@@ -3,7 +3,7 @@
 	import { cn } from '$lib/utils/cn';
 	import { CircleAlert } from 'lucide-svelte';
 
-	let { isOpen, onClose, item, data = undefined } = $props();
+	let { isOpen, onClose, action, item, data = undefined } = $props();
 
 	const selectedRoles = $derived(data);
 	const closeModal = () => {
@@ -66,7 +66,7 @@
 			<div class="flex items-center justify-end gap-3 border-t px-5 py-4">
 				<form
 					method="POST"
-					action="?/deleteRole"
+					{action}
 					class="modal-action mt-6"
 					use:enhance={() => {
 						loading = true;

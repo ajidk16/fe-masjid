@@ -3,7 +3,19 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { cn } from '$lib/utils/cn.js';
-	import { Clock, FileText, LayoutDashboard, Menu, Plus, Users, X } from 'lucide-svelte';
+	import {
+		ArrowUpDown,
+		Clock,
+		DollarSign,
+		FileText,
+		LayoutDashboard,
+		Menu,
+		Plus,
+		ShieldCheck,
+		Users,
+		Vibrate,
+		X
+	} from 'lucide-svelte';
 
 	let { children, data } = $props();
 	const profile = $derived(JSON.parse(data.profile || ''));
@@ -47,6 +59,43 @@
 			href: '/admin/users',
 			icon: Users,
 			role: 'admin'
+		},
+		{
+			name: 'Referensi',
+			role: 'admin',
+			icon: FileText,
+			subMenu: [
+				{
+					name: 'Roles & Permissions',
+					href: '/admin/references/roles',
+					icon: Users
+				},
+				{
+					name: 'Sumber Donasi',
+					href: '/admin/references/donations',
+					icon: Vibrate
+				},
+				{
+					name: 'Status Halal',
+					href: '/admin/references/halal-status',
+					icon: ShieldCheck
+				},
+				{
+					name: 'Status Pembayaran',
+					href: '/admin/references/payment-status',
+					icon: DollarSign
+				},
+				{
+					name: 'Status Pesanan',
+					href: '/admin/references/order-status',
+					icon: ArrowUpDown
+				},
+				{
+					name: 'Modul Aplikasi',
+					href: '/admin/references/modules',
+					icon: LayoutDashboard
+				}
+			]
 		}
 	];
 
@@ -83,21 +132,60 @@
 			</div>
 		</a>
 		<nav class="space-y-1 p-3">
-			{#each listSidebar as item}
-				<a
-					class={cn(
-						'flex items-center gap-3 rounded-xl px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800',
-						item.name === breadcrumb.title ? 'bg-brand-50 text-brand-900 dark:bg-slate-800/70' : '',
-						item.role && profile.role.code !== 'admin' && profile.role.code !== item.role
-							? 'hidden'
-							: ''
-					)}
-					href={item.href}
-				>
-					<item.icon size={20} />
-					{item.name}
-				</a>
-			{/each}
+			<ul class="menu w-full">
+				{#each listSidebar as item}
+					{#if !item.subMenu}
+						{console.log(item.name === breadcrumb.title)}
+						<li
+							class={cn(
+								item.role && profile.role.code !== 'admin' && profile.role.code !== item.role
+									? 'hidden'
+									: ''
+							)}
+						>
+							<a
+								class={cn(
+									'flex items-center gap-3 rounded-xl px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800',
+									item.href === page.url.pathname
+										? 'bg-brand-50 text-brand-900 dark:bg-slate-800/70'
+										: ''
+								)}
+								href={item.href}
+							>
+								<item.icon size={20} />
+								{item.name}
+							</a>
+						</li>
+					{:else}
+						<li>
+							<details open={item.subMenu.some((sub) => sub.href === page.url.pathname)}>
+								<summary>
+									<item.icon size={20} />
+									{item.name}
+								</summary>
+								<ul>
+									{#each item.subMenu as subItem}
+										<li>
+											<a
+												class={cn(
+													'flex items-center gap-3 rounded-xl px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800',
+													subItem.href === page.url.pathname
+														? 'bg-brand-50 text-brand-900 dark:bg-slate-800/70'
+														: ''
+												)}
+												href={subItem.href}
+											>
+												<subItem.icon size={16} />
+												{subItem.name}
+											</a>
+										</li>
+									{/each}
+								</ul>
+							</details>
+						</li>
+					{/if}
+				{/each}
+			</ul>
 		</nav>
 		<div class="mt-auto p-4 text-xs text-slate-500">v1.0 • © Komunitas</div>
 	</aside>
@@ -290,7 +378,7 @@
 						: ''}"
 					onclick={() => {
 						drawerOpen = false;
-						goto(item.href);
+						if (item.href) goto(item.href);
 					}}
 				>
 					<item.icon size={20} />

@@ -13,11 +13,12 @@ type Permission = {
 };
 
 export type Role = {
+	id: string;
 	label: string;
 	code: string;
 	description: string;
-	memberCount: number;
-	permission: Permission[];
+	memberCount?: number;
+	permission?: Permission[];
 };
 
 export type User = {
