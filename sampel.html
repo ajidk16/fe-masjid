@@ -1,77 +1,185 @@
 <!doctype html>
-<html lang="id" class="scroll-smooth">
+<html lang="id" class="h-full">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Reset Password — Masjid Digital</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Modal Delete — Tailwind</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: { 50:'#f0fdf4',100:'#dcfce7',200:'#bbf7d0',300:'#86efac',400:'#4ade80',500:'#22c55e',600:'#16a34a',700:'#15803d',800:'#166534',900:'#14532d' },
-            gold:  { 50:'#fefce8',100:'#fef9c3',200:'#fef08a',300:'#fde047',400:'#facc15',500:'#eab308',600:'#ca8a04',700:'#a16207',800:'#854d0e',900:'#713f12' }
-          }
-        }
-      }
-    }
-  </script>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
-  <div class="min-h-dvh flex flex-col items-center justify-center px-4">
-    <!-- Card -->
-    <div class="w-full max-w-md rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-md p-6 space-y-6">
-      <!-- Header -->
-      <div class="text-center space-y-2">
-        <div class="mx-auto w-14 h-14 rounded-2xl bg-brand-900 text-white grid place-items-center text-2xl font-bold">م</div>
-        <h1 class="text-xl font-semibold">Atur Ulang Kata Sandi</h1>
-        <p class="text-sm text-slate-500">Masukkan kata sandi baru untuk akun Anda</p>
-      </div>
-
-      <!-- Form -->
-      <form class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-slate-600 dark:text-slate-300">Kata Sandi Baru</label>
-          <input type="password" placeholder="••••••••" class="mt-1 w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-brand-300 dark:focus:ring-brand-700 outline-none">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-slate-600 dark:text-slate-300">Ulangi Kata Sandi</label>
-          <input type="password" placeholder="••••••••" class="mt-1 w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-brand-300 dark:focus:ring-brand-700 outline-none">
-        </div>
-
-        <button type="submit" class="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-medium transition">
-          Simpan Kata Sandi
-        </button>
-      </form>
-
-      <!-- Info -->
-      <div class="text-center text-sm text-slate-500">
-        <p>Sudah ingat kata sandi?</p>
-        <a href="/login" class="text-brand-700 hover:underline font-medium">Kembali ke Login</a>
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <p class="mt-8 text-xs text-slate-400">© 2025 Masjid Digital • Aman dan Halal</p>
+<body class="h-full bg-slate-50 text-slate-800 antialiased">
+  <div class="min-h-full grid place-items-center p-8">
+    <!-- Trigger -->
+    <button id="openModal"
+      class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2 text-white font-medium shadow hover:bg-red-700 active:scale-[0.98]">
+      <!-- Trash icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+              d="M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m3 0V5.5A2.5 2.5 0 0 1 10.5 3h3A2.5 2.5 0 0 1 16 5.5V7M4 7h16M10 11v6m4-6v6"/>
+      </svg>
+      Hapus Item
+    </button>
   </div>
 
-  <!-- Optional dark mode toggle -->
-  <button id="toggle" class="fixed bottom-4 right-4 p-2 rounded-xl bg-slate-200 dark:bg-slate-800">
-    <svg class="size-5 block dark:hidden" viewBox="0 0 24 24" fill="none">
-      <path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M3 12h2M19 12h2" stroke="currentColor" stroke-width="2"/>
-      <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/>
-    </svg>
-    <svg class="size-5 hidden dark:block" viewBox="0 0 24 24" fill="none">
-      <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2"/>
-    </svg>
-  </button>
+  <!-- Modal Root -->
+<!-- Backdrop -->
+<div class="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/60">
+  <!-- Modal -->
+  <div class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl ring-1 ring-slate-200">
+    <!-- Header -->
+    <div class="mb-4 flex items-start justify-between gap-4">
+      <!-- Ganti teks ini: Create / Edit -->
+      <div>
+        <h2 class="text-lg font-semibold text-slate-900">
+          Create Data Jamaah
+          <!-- contoh lain: Edit Data Jamaah -->
+        </h2>
+        <p class="mt-1 text-sm text-slate-500">
+          Lengkapi informasi di bawah, lalu klik simpan untuk menyimpan perubahan.
+        </p>
+      </div>
+      <button
+        type="button"
+        aria-label="Tutup"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:bg-slate-100"
+      >
+        ✕
+      </button>
+    </div>
 
+    <!-- Body / Form -->
+    <form class="space-y-4">
+      <!-- Contoh field: Nama -->
+      <div class="space-y-1.5">
+        <label for="nama" class="text-sm font-medium text-slate-700">
+          Nama Lengkap
+        </label>
+        <input
+          id="nama"
+          type="text"
+          placeholder="Masukkan nama lengkap"
+          class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 outline-none ring-0 transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-100"
+        />
+      </div>
+
+      <!-- Contoh field: Email -->
+      <div class="space-y-1.5">
+        <label for="email" class="text-sm font-medium text-slate-700">
+          Email
+        </label>
+        <input
+          id="email"
+          type="email"
+          placeholder="contoh: nama@mail.com"
+          class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 outline-none ring-0 transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-100"
+        />
+      </div>
+
+      <!-- Contoh field: Role / Jenis -->
+      <div class="space-y-1.5">
+        <label for="role" class="text-sm font-medium text-slate-700">
+          Peran
+        </label>
+        <select
+          id="role"
+          class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-100"
+        >
+          <option value="">Pilih peran</option>
+          <option value="jamaah">Jamaah</option>
+          <option value="pengurus">Pengurus</option>
+          <option value="bendahara">Bendahara</option>
+        </select>
+      </div>
+
+      <!-- Contoh field: Status aktif -->
+      <div class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2.5">
+        <div>
+          <p class="text-sm font-medium text-slate-800">Status Akun</p>
+          <p class="text-xs text-slate-500">Aktifkan jika jamaah masih aktif.</p>
+        </div>
+        <label class="inline-flex cursor-pointer items-center">
+          <input type="checkbox" class="peer sr-only" />
+          <span
+            class="relative inline-flex h-6 w-11 items-center rounded-full bg-slate-300 transition peer-checked:bg-emerald-500"
+          >
+            <span
+              class="inline-block h-5 w-5 translate-x-0 rounded-full bg-white shadow transition peer-checked:translate-x-5"
+            ></span>
+          </span>
+        </label>
+      </div>
+    </form>
+
+    <!-- Footer / Actions -->
+    <div class="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+      <button
+        type="button"
+        class="inline-flex w-full items-center justify-center rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 sm:w-auto"
+      >
+        Batal
+      </button>
+      <!-- Ganti teks button ini: Simpan / Update -->
+      <button
+        type="submit"
+        class="inline-flex w-full items-center justify-center rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 sm:w-auto"
+      >
+        Simpan Data
+      </button>
+    </div>
+  </div>
+</div>
+
+  <!-- Minimal JS: open/close + esc + focus trap -->
   <script>
-    const root=document.documentElement;
-    const btn=document.getElementById('toggle');
-    btn.addEventListener('click',()=>{root.classList.toggle('dark');});
+    const root = document.getElementById('modalRoot');
+    const openBtn = document.getElementById('openModal');
+    const confirmBtn = document.getElementById('confirmDelete');
+
+    const open = () => {
+      root.classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+      // focus first focusable
+      const f = getFocusable();
+      f[0]?.focus();
+      // mark as visible
+      root.setAttribute('aria-hidden', 'false');
+    };
+    const close = () => {
+      root.classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+      root.setAttribute('aria-hidden', 'true');
+      openBtn.focus();
+    };
+    const getFocusable = () => {
+      return root.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+    };
+
+    openBtn.addEventListener('click', open);
+    root.addEventListener('click', (e) => {
+      if (e.target === root || e.target.hasAttribute('data-close')) close();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (root.classList.contains('hidden')) return;
+      if (e.key === 'Escape') close();
+      if (e.key === 'Tab') {
+        const f = Array.from(getFocusable());
+        if (!f.length) return;
+        const i = f.indexOf(document.activeElement);
+        if (e.shiftKey && (i === 0 || i === -1)) {
+          f[f.length - 1].focus(); e.preventDefault();
+        } else if (!e.shiftKey && i === f.length - 1) {
+          f[0].focus(); e.preventDefault();
+        }
+      }
+    });
+
+    // Demo: handle confirm
+    confirmBtn.addEventListener('click', () => {
+      // TODO: panggil API hapus di sini
+      close();
+      alert('Item dihapus.');
+    });
   </script>
 </body>
 </html>

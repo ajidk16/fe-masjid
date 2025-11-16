@@ -1,29 +1,22 @@
 import { api } from '$lib/utils/api.js';
 import { error } from '@sveltejs/kit';
 
-export const load = async ({ cookies }) => {
-	const members = await api('/mosques/members', {
-		method: 'GET',
-		headers: {
-			Authorization: `Bearer ${cookies.get('auth_token')}`,
-			'Content-Type': 'application/json'
-		}
-	});
+export const load = async ({ url, cookies }) => {
+	const authHeader = {
+		Authorization: `Bearer ${cookies.get('auth_token')}`,
+		'Content-Type': 'application/json'
+	};
 
-	if (!members) {
-		return error(500, 'Failed to fetch members');
-	}
+	const page = url.searchParams.get('page') ? parseInt(url.searchParams.get('page')!) : 1;
+	const limit = url.searchParams.get('limit') ? parseInt(url.searchParams.get('limit')!) : 12;
 
-	const roles = await api('/references/roles', {
-		method: 'GET',
-		headers: {
-			Authorization: `Bearer ${cookies.get('auth_token')}`,
-			'Content-Type': 'application/json'
-		}
-	});
+	const [members, roles] = await Promise.all([
+		api(`/mosques/members?page=${page}&limit=${limit}`, { method: 'GET', headers: authHeader }),
+		api(`/references/roles?page=${page}&limit=${limit}`, { method: 'GET', headers: authHeader })
+	]);
 
-	if (!roles) {
-		return error(500, 'Failed to fetch roles');
+	if (!members || !roles) {
+		return error(500, 'Failed to fetch data');
 	}
 
 	return {
@@ -78,6 +71,87 @@ export const actions = {
 			})
 		);
 
-		return result[0];
+		return result;
+	},
+	createRole: async ({ request, cookies }) => {
+		const formData = await request.formData();
+		const code = formData.get('code');
+		const label = formData.get('label');
+		const description = formData.get('description');
+
+		if (!code || !label || !description) {
+			return error(400, 'Missing role data');
+		}
+
+		const newRole = await api('/references/roles', {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${cookies.get('auth_token')}`,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				code,
+				label,
+				description
+			})
+		});
+
+		if (!newRole) {
+			return error(500, 'Failed to create role');
+		}
+
+		return newRole;
+	},
+	updateRole: async ({ request, cookies }) => {
+		const formData = await request.formData();
+		const id = formData.get('id');
+		const code = formData.get('code');
+		const label = formData.get('label');
+		const description = formData.get('description');
+
+		if (!id || !code || !label || !description) {
+			return error(400, 'Missing role data');
+		}
+
+		const updatedRole = await api('/references/roles/' + id, {
+			method: 'PUT',
+			headers: {
+				Authorization: `Bearer ${cookies.get('auth_token')}`,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				code,
+				label,
+				description
+			})
+		});
+
+		if (!updatedRole) {
+			return error(500, 'Failed to update role');
+		}
+
+		return updatedRole;
+	},
+	deleteRole: async ({ request, cookies }) => {
+		const formData = await request.formData();
+		const id = formData.get('id');
+
+		if (!id) {
+			return error(400, 'Missing role ID');
+		}
+
+		const deletedRole = await api('/references/roles/' + id, {
+			method: 'DELETE',
+			headers: {
+				Authorization: `Bearer ${cookies.get('auth_token')}`,
+				'Content-Type': 'application/json'
+			}
+		});
+
+		if (!deletedRole) {
+			return error(500, 'Failed to delete role');
+		}
+
+		return deletedRole;
 	}
 };
