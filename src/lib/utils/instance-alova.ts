@@ -14,8 +14,7 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
 	assignToken: (method) => {
 		if (typeof document === 'undefined') return; // cek apakah di browser
 		const token = getCookie('auth_token');
-		console.log('Fetching token from cookies', token);
-		console.log('Assigning token:', token);
+
 		if (token) method.config.headers.Authorization = `Bearer ${token}`;
 	}
 });

@@ -7,6 +7,11 @@ export const formatDate = (dateString: string): string => {
 	});
 };
 
+export const formatDateISO = (dateString: string): string => {
+	const date = new Date(dateString);
+	return date.toISOString().split('T')[0];
+};
+
 export const formatDateTime = (dateString: string): string => {
 	const date = new Date(dateString);
 	return date.toLocaleString('id-ID', {
@@ -17,3 +22,10 @@ export const formatDateTime = (dateString: string): string => {
 		minute: '2-digit'
 	});
 };
+
+export const formatDay = (dateString: string): string => {
+	const date = new Date(dateString);
+	return date.toLocaleDateString('id-ID', {
+		weekday: 'long'
+	});
+}

@@ -1,11 +1,49 @@
 <script lang="ts">
-	const prayers = [
-		{ name: 'Subuh', time: '04:21' },
-		{ name: 'Dzuhur', time: '11:40' },
-		{ name: 'Ashar', time: '15:03' },
-		{ name: 'Maghrib', time: '17:53' },
-		{ name: 'Isya', time: '19:05' }
-	];
+	import { page } from '$app/state';
+	import { Prayers, UpdateCountdown, type Prayer } from '$lib/utils/prayers';
+	import { onDestroy, onMount } from 'svelte';
+
+	let { data } = $props();
+
+	const tanggal = $derived(data.tanggal);
+	const weather = $derived(data.weather);
+
+	// countdown to next prayer
+	let countdown = $state('');
+	let infoMessage = $state('');
+
+	let prayers: Prayer[] = $state([]);
+	let nextPrayer: Prayer | null = $state(null);
+
+	const jadwal = $derived(page.data.jadwal);
+
+	const loadPrayers = async () => {
+		const result = await Prayers(jadwal);
+		prayers = result.prayers;
+		nextPrayer = result.nextPrayer;
+	};
+
+	const loadCountdown = async () => {
+		const result = await UpdateCountdown({
+			nextPrayer,
+			countdown,
+			infoMessage
+		});
+		countdown = result.countdown;
+		infoMessage = result.infoMessage;
+	};
+
+	let interval: ReturnType<typeof setInterval>;
+
+	onMount(() => {
+		loadPrayers();
+		loadCountdown();
+		interval = setInterval(loadCountdown, 1000);
+	});
+
+	onDestroy(() => {
+		clearInterval(interval);
+	});
 </script>
 
 <main>
@@ -24,10 +62,14 @@
 							</div>
 							<div class="flex items-center gap-3">
 								<div class="rounded-xl bg-white/10 px-3 py-2 text-sm">
-									<span id="weather">Cuaca: Berawan • 29°C</span>
+									<div id="weather">Cuaca:</div>
+									<div class="capitalize">
+										{weather?.weather[0]?.description} • {Math.round(weather?.main?.temp)}°C
+									</div>
 								</div>
 								<div class="rounded-xl bg-white/10 px-3 py-2 text-sm">
-									<span id="hijri">Hijriyah: —</span>
+									<div id="hijri">Hijri</div>
+									<div class="capitalize">{tanggal?.terbilangbakdamaghrib?.split('|')?.at(0)}</div>
 								</div>
 							</div>
 						</div>
@@ -119,26 +161,33 @@
 					<div class="flex items-center justify-between">
 						<h3 class="font-semibold text-slate-800">Jadwal Salat Hari Ini</h3>
 						<span id="next-label" class="rounded-full bg-brand-100 px-2 py-1 text-xs text-brand-800"
-							>Waktu terdekat</span
+							>{countdown}</span
 						>
 					</div>
 					<ul id="prayer-list" class="mt-4 space-y-2">
-						{#each prayers as prayer, index}
+						{#each prayers as prayer}
 							<li
-								class="flex items-center justify-between rounded-xl border px-4 py-3 {index === 0
+								class="flex items-center justify-between rounded-xl border px-4 py-3 {prayer.name ===
+								nextPrayer?.name
 									? 'border-brand-300 bg-brand-50'
 									: 'border-slate-200 bg-white'}"
 							>
 								<div class="flex items-center gap-3">
 									<span
-										class="h-2.5 w-2.5 rounded-full {index === 0 ? 'bg-brand-600' : 'bg-slate-300'}"
+										class="h-2.5 w-2.5 rounded-full {prayer.name === nextPrayer?.name
+											? 'bg-brand-600'
+											: 'bg-slate-300'}"
 									></span>
-									<span class="font-medium {index === 0 ? 'text-brand-800' : 'text-slate-800'}"
-										>{prayer.name}</span
+									<span
+										class="font-medium {prayer.name === nextPrayer?.name
+											? 'text-brand-800'
+											: 'text-slate-800'}">{prayer.name}</span
 									>
 								</div>
-								<time class="tabular-nums {index === 0 ? 'text-brand-700' : 'text-slate-600'}"
-									>{prayer.time} WIB</time
+								<time
+									class="tabular-nums {prayer.name === nextPrayer?.name
+										? 'text-brand-700'
+										: 'text-slate-600'}">{prayer.time} WIB</time
 								>
 							</li>
 						{/each}
@@ -319,3 +368,11 @@
 
 	<!-- Footer -->
 </main>
+
+{#if infoMessage !== ''}
+	<div class="toast toast-end toast-top z-50 animate-bounce">
+		<div class="alert alert-info">
+			<span>{infoMessage}</span>
+		</div>
+	</div>
+{/if}

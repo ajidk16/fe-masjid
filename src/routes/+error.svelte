@@ -5,8 +5,6 @@
 	const today = formatDateTime(new Date().toString());
 	const year = new Date().getFullYear();
 	const requestId = page.url.href;
-
-	console.log('Error page loaded', page.error, 'data:', page.url);
 </script>
 
 <main class="grid min-h-full place-items-center p-6">

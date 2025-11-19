@@ -20,8 +20,6 @@ export const actions: Actions = {
 			});
 		}
 
-        console.log('Forgot password response:', res);
-
 		return {
 			status: res.status,
 			message: res.message

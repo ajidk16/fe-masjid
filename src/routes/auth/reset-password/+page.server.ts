@@ -20,7 +20,6 @@ export const actions: Actions = {
 			},
 			body: JSON.stringify({ token, newPassword })
 		});
-		console.log('Resetting password for token:', res);
 
 		if (res.type === 'validation' || res.status === 400) {
 			throw error(res.status === 400 ? 400 : 500, {

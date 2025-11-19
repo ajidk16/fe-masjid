@@ -8,10 +8,12 @@
 		Clock,
 		DollarSign,
 		FileText,
+		HousePlus,
 		LayoutDashboard,
 		Menu,
 		Plus,
 		ShieldCheck,
+		SquareCheckBig,
 		Users,
 		Vibrate,
 		X
@@ -66,6 +68,11 @@
 			icon: FileText,
 			subMenu: [
 				{
+					name: 'Mitra Masjid',
+					href: '/admin/references/partners',
+					icon: HousePlus
+				},
+				{
 					name: 'Roles & Permissions',
 					href: '/admin/references/roles',
 					icon: Users
@@ -94,6 +101,11 @@
 					name: 'Modul Aplikasi',
 					href: '/admin/references/modules',
 					icon: LayoutDashboard
+				},
+				{
+					name: 'Kategori',
+					href: '/admin/references/categories',
+					icon: SquareCheckBig
 				}
 			]
 		}
@@ -135,7 +147,6 @@
 			<ul class="menu w-full">
 				{#each listSidebar as item}
 					{#if !item.subMenu}
-						{console.log(item.name === breadcrumb.title)}
 						<li
 							class={cn(
 								item.role && profile.role.code !== 'admin' && profile.role.code !== item.role
@@ -162,6 +173,7 @@
 								<summary>
 									<item.icon size={20} />
 									{item.name}
+									<span class="badge badge-soft badge-sm badge-info">{item.subMenu.length}</span>
 								</summary>
 								<ul>
 									{#each item.subMenu as subItem}

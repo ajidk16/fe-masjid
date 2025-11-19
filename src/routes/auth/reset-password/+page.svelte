@@ -58,7 +58,6 @@
 				method="POST"
 				use:enhance={() => {
 					return async ({ result }: any) => {
-						console.log(result);
 						loading = false;
 						if (result?.error) {
 							infoMessage = result?.error?.message;

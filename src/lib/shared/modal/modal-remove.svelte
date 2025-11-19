@@ -58,7 +58,7 @@
 				<div class="rounded-xl border bg-slate-50 px-4 py-3 text-sm text-slate-700">
 					<div class="flex items-center justify-between">
 						<span>Nama item</span>
-						<span class="font-medium">"{selectedRoles.label}"</span>
+						<span class="font-medium">"{item}"</span>
 					</div>
 				</div>
 			</div>

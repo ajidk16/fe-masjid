@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { resultStore, setResult } from '$lib/store/form-result';
 	import { cn } from '$lib/utils/cn';
 	import { X } from 'lucide-svelte';
 
@@ -36,10 +37,20 @@
 			use:enhance={() => {
 				loading = true;
 
-				setTimeout(() => {
-					loading = false;
-					showToast = true;
-				}, 500);
+				return async ({ result, update }) => {
+					if (result.status == 400) {
+						setResult(result);
+						setTimeout(() => {
+							loading = false;
+						}, 500);
+					} else {
+						setTimeout(() => {
+							loading = false;
+							showToast = true;
+						}, 500);
+					}
+					await update();
+				};
 			}}
 			{action}
 		>

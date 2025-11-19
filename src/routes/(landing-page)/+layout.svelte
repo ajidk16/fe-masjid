@@ -1,11 +1,13 @@
-<script>
+<script lang="ts">
 	import { Footer } from '$lib/shared';
 	import { page } from '$app/state';
-	import { MapPin, Menu, User, X } from 'lucide-svelte';
+	import { MapPin, Menu, Moon, Sun, User, X } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
 
 	let sidemenuOpen = $state(false);
-	let { children } = $props();
+	let { data, children } = $props();
+
+	const town = $derived(data.location);
 
 	const listNavigation = [
 		{ name: 'Jadwal Salat', href: '/beranda' },
@@ -14,6 +16,32 @@
 		// { name: 'Marketplace', href: '/market' },
 		{ name: 'Kontak', href: '/kontak' }
 	];
+
+	let loading = $state(false);
+
+	const handleGetLocation = async () => {
+		return new Promise((resolve) => {
+			navigator.geolocation.getCurrentPosition(
+				async (position) => {
+					const latitude = position.coords.latitude;
+					const longitude = position.coords.longitude;
+
+					// Kirim ke server action
+					const response = await fetch('/admin/users?/getLocation', {
+						method: 'POST',
+						body: new URLSearchParams({
+							latitude: String(latitude),
+							longitude: String(longitude)
+						})
+					});
+
+					const result = await response.json();
+					resolve(true);
+				},
+				() => resolve(false)
+			);
+		});
+	};
 </script>
 
 <main class="bg-slate-25 text-slate-800">
@@ -48,12 +76,41 @@
 				{/each}
 			</nav>
 			<div class="flex items-center gap-2">
+				<label class="swap mr-1 swap-rotate">
+					<input type="checkbox" class="hidden" />
+					<Sun class="swap-on " size={20} />
+					<Moon class="swap-off " size={20} />
+				</label>
+
 				<button
-					class="hidden items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm hover:bg-slate-100 sm:inline-flex"
+					type="button"
+					class="hidden cursor-pointer items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm hover:bg-slate-100 sm:inline-flex"
+					disabled={loading || town != null}
+					onclick={() => {
+						loading = true;
+						setTimeout(async () => {
+							handleGetLocation();
+							loading = false;
+						}, 300);
+						setTimeout(() => {
+							location.reload();
+						}, 1000);
+					}}
 				>
-					<MapPin size={16} />
-					<span id="loc">Lampung</span>
+					{#if loading}
+						<span class="flex items-center gap-2">
+							<span class="loading loading-sm loading-spinner"></span>
+							<span>Memproses</span>
+						</span>
+					{:else if town}
+						<MapPin size={16} />
+						<span>{town}</span>
+					{:else}
+						<MapPin size={16} />
+						<span>Cari lokasi...</span>
+					{/if}
 				</button>
+
 				<a
 					href="/auth/sign-in"
 					class="hidden items-center gap-2 rounded-xl bg-brand-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-700 md:inline-flex"

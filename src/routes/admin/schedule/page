@@ -2,9 +2,7 @@
 	import { page } from '$app/state';
 	import { Modal } from '$lib/shared/index.js';
 	import { resultStore } from '$lib/store/form-result.js';
-	import { cn } from '$lib/utils/cn';
 	import { Prayers, type Prayer } from '$lib/utils/prayers.js';
-	import { Calendar } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { writable, derived, get } from 'svelte/store';
 
@@ -49,13 +47,12 @@
 		'Desember'
 	] as const;
 
-	const today = new Date();
-	const year = writable(today.getFullYear());
-	const month = writable(today.getMonth()); // 0-indexed
+	const year = writable(2023);
+	const month = writable(10); // November (0-indexed)
 
-	const dataEvents = $derived(page.data.events.data);
+	const events = writable<Event[]>(page.data.events.data);
 
-	const events = writable<Event[]>(dataEvents);
+	console.log('test error', $resultStore);
 
 	// Utility fungsi format tanggal YYYY-MM-DD
 	function fmt(date: Date) {
@@ -76,20 +73,19 @@
 		}
 	}
 
-	// Store tanggal yang dipilih (default hari ini)
-	const yesterday = new Date(today);
-	// yesterday.setDate(yesterday.getDate() - 1);
-	let selectedDate = writable(fmt(yesterday));
+	// Store tanggal dan bulan sekarang
+	const today = new Date();
+	let selectedDate = writable(fmt(today));
+	year.set(today.getFullYear());
+	month.set(today.getMonth());
 
 	// Kalkulasi grid kalender setiap ubah tahun/bulan
 	const calendarCells = derived([year, month], ([$year, $month]) => {
-		const firstDay = new Date($year, $month, 2);
+		const firstDay = new Date($year, $month, 1);
 		const lastDay = new Date($year, $month + 1, 0);
 		// Senin sebagai hari pertama (0)
-
 		const startDay = (firstDay.getDay() + 6) % 7;
-		const daysInPrevMonth = new Date($year, $month, 1).getDate();
-
+		const daysInPrevMonth = new Date($year, $month, 0).getDate();
 		const totalCells = 42;
 		const cells = [];
 
@@ -98,16 +94,16 @@
 			let inMonth = true;
 			let dateObj: Date;
 			if (i < startDay) {
-				dayNum = daysInPrevMonth - (startDay - 0 - i);
+				dayNum = daysInPrevMonth - (startDay - 1 - i);
 				inMonth = false;
-				dateObj = new Date($year, $month - 1, dayNum + 1);
+				dateObj = new Date($year, $month - 1, dayNum);
 			} else if (i < startDay + lastDay.getDate()) {
 				dayNum = i - startDay + 1;
-				dateObj = new Date($year, $month, dayNum + 1);
+				dateObj = new Date($year, $month, dayNum);
 			} else {
 				dayNum = i - (startDay + lastDay.getDate()) + 1;
 				inMonth = false;
-				dateObj = new Date($year, $month + 1, dayNum + 1);
+				dateObj = new Date($year, $month + 1, dayNum);
 			}
 			cells.push({ dayNum, inMonth, dateISO: fmt(dateObj) });
 		}
@@ -115,37 +111,17 @@
 	});
 
 	// Events pada tanggal yang dipilih
-	const eventsOnSelectedDate = derived([events, selectedDate], ([$events, $selectedDate]) => {
-		console.log('Filtering events for date:', $selectedDate);
-
-		return $events.filter((e) => e.date === $selectedDate);
-	});
-
-	// ambil data event per bulan berdasarkan data monthNames dan year
-	const eventsThisMonth = derived([events, month, year], ([$events, $month, $year]) => {
-		return $events.filter((e) => {
-			const eventDate = new Date(e.date);
-
-			return eventDate.getMonth() === $month && eventDate.getFullYear() === $year;
-		});
-	});
+	const eventsOnSelectedDate = derived([events, selectedDate], ([$events, $selectedDate]) =>
+		$events.filter((e) => e.date === $selectedDate)
+	);
 
 	// Event mendatang: 8 event terdekat dari hari ini dan sesudahnya
 	const upcomingEvents = derived(events, ($events) => {
 		const now = new Date();
 		const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-		// filter perbulan
-		// $events = $events.filter((e) => new Date(e.date).getMonth() === todayDate.getMonth());
-		const currentMonth = get(month);
-		const currentYear = get(year);
-
 		return $events
 			.map((e) => ({ ...e, d: new Date(e.date + 'T' + (e.startAt || '00:00')) }))
-			.filter((e) => {
-				const eventMonth = e.d.getMonth();
-				const eventYear = e.d.getFullYear();
-				return eventMonth === currentMonth && eventYear === currentYear && e.d >= todayDate;
-			})
+			.filter((e) => e.d >= todayDate)
 			.sort((a, b) => a.d.getTime() - b.d.getTime())
 			.slice(0, 8);
 	});
@@ -250,24 +226,20 @@
 				<div class="p-2 text-center">Sab</div>
 			</div>
 			<div class="mt-1 grid grid-cols-7 gap-1 text-sm">
-				{#each $calendarCells as item}
+				{#each $calendarCells as { dayNum, inMonth, dateISO }}
 					<button
-						onclick={() => {
-							selectDate(item.dateISO);
-						}}
-						class={cn(
-							'group relative h-24 rounded-xl border p-2 text-left align-top',
-							item.inMonth
-								? 'border-slate-200 dark:border-slate-800 dark:bg-slate-900'
-								: 'border-dashed border-slate-200/60 bg-slate-50/40 dark:border-slate-800/60 dark:bg-slate-950/30',
-							'hover:ring-2 hover:ring-brand-300 dark:hover:ring-brand-700',
-							item.dateISO === $selectedDate ? 'ring-2 ring-brand-600' : '',
-							new Date(item.dateISO).getDay() === 0 ? 'bg-red-50 dark:bg-red-950/20' : ''
-						)}
+						onclick={() => selectDate(dateISO)}
+						class={`group relative h-24 rounded-xl border p-2 text-left align-top
+              ${
+								inMonth
+									? 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900'
+									: 'border-dashed border-slate-200/60 bg-slate-50/40 dark:border-slate-800/60 dark:bg-slate-950/30'
+							}
+              hover:ring-2 hover:ring-brand-300 dark:hover:ring-brand-700`}
 					>
 						<div class="flex items-center justify-between">
-							<span class={`text-xs ${item.inMonth ? '' : 'text-slate-400'}`}>{item.dayNum}</span>
-							{#if item.dateISO === $selectedDate}
+							<span class={`text-xs ${inMonth ? '' : 'text-slate-400'}`}>{dayNum}</span>
+							{#if dateISO === $selectedDate}
 								<span
 									class="inline-flex size-5 items-center justify-center rounded-full bg-brand-600 text-[10px] text-white"
 									>Now</span
@@ -275,14 +247,14 @@
 							{/if}
 						</div>
 						<div class="mt-1 space-y-1 overflow-hidden">
-							{#each $events.filter((e) => e.date === item.dateISO).slice(0, 1) as e}
+							{#each $events.filter((e) => e.date === dateISO).slice(0, 3) as e}
 								<div class={`truncate rounded-lg px-2 py-1 text-[11px] ${badgeByCat(e.category)}`}>
 									{e.startAt} &bull; {e.title}
 								</div>
 							{/each}
-							{#if $events.filter((e) => e.date === item.dateISO).length > 1}
+							{#if $events.filter((e) => e.date === dateISO).length > 3}
 								<div class="text-[10px] text-slate-500">
-									+{$events.filter((e) => e.date === item.dateISO).length - 1} lainnya
+									+{$events.filter((e) => e.date === dateISO).length - 3} lainnya
 								</div>
 							{/if}
 						</div>
@@ -296,40 +268,26 @@
 			class="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
 		>
 			<div class="flex items-center justify-between">
-				<p class="font-medium">Kegiatan Mendatang</p>
+				<p class="font-medium">KegiatanMendatang</p>
 				<button class="rounded-lg bg-slate-100 px-3 py-1.5 text-sm dark:bg-slate-800"
-					>Lihat Semua</button
+					>LihatSemua</button
 				>
 			</div>
-			<ol class="thin-scrollbar mt-4 h-full max-h-144 space-y-4 overflow-auto text-sm">
-				{#if $eventsThisMonth?.length === 0}
-					<div class="flex flex-col items-center justify-center py-8 text-center">
-						<div
-							class="mb-3 grid size-16 place-items-center rounded-2xl bg-slate-100 dark:bg-slate-800"
-						>
-							<Calendar class="size-8 text-slate-400" />
-						</div>
-						<p class="font-medium text-slate-700 dark:text-slate-300">Tidak ada kegiatan</p>
-						<p class="mt-1 text-sm text-slate-500">Belum ada kegiatan dijadwalkan bulan ini</p>
-					</div>
-				{:else}
-					{#each $eventsThisMonth as event}
-						<li class="flex gap-3">
-							<span
-								class={`grid size-9 place-items-center rounded-xl ${badgeByCat(event.category)}`}
+			<ol class="thin-scrollbar mt-4 max-h-[28rem] space-y-4 overflow-auto text-sm">
+				{#each $upcomingEvents as event}
+					<li class="flex gap-3">
+						<span class={`grid size-9 place-items-center rounded-xl ${badgeByCat(event.category)}`}>
+							{event.startAt.split(':')[0]}<span class="text-[10px]"
+								>:{event.startAt.split(':')[1]}</span
 							>
-								{event.startAt.split(':')[0]}<span class="text-[10px]"
-									>:{event.startAt.split(':')[1]}</span
-								>
-							</span>
-							<div>
-								<p class="font-medium">{event.title}</p>
-								<p class="text-slate-500">{event.category} &bull; {event.location}</p>
-								<p class="text-xs text-slate-500">{formatDate(event.date)}</p>
-							</div>
-						</li>
-					{/each}
-				{/if}
+						</span>
+						<div>
+							<p class="font-medium">{event.title}</p>
+							<p class="text-slate-500">{event.category} &bull; {event.location}</p>
+							<p class="text-xs text-slate-500">{formatDate(event.date)}</p>
+						</div>
+					</li>
+				{/each}
 			</ol>
 		</div>
 	</section>
@@ -349,23 +307,7 @@
 			</div>
 			<div id="todayList" class="space-y-3 p-4 text-sm">
 				{#if $eventsOnSelectedDate.length === 0}
-					<div class="flex flex-col items-center justify-center py-12 text-center">
-						<div
-							class="mb-4 grid size-20 place-items-center rounded-2xl bg-slate-100 dark:bg-slate-800"
-						>
-							<Calendar class="size-10 text-slate-400" />
-						</div>
-						<p class="font-medium text-slate-700 dark:text-slate-300">Tidak ada kegiatan</p>
-						<p class="mt-1 text-sm text-slate-500">
-							Belum ada kegiatan dijadwalkan pada {formatDate($selectedDate)}
-						</p>
-						<button
-							onclick={() => (modal = true)}
-							class="mt-4 rounded-xl bg-brand-600 px-4 py-2 text-sm text-white hover:bg-brand-700"
-						>
-							Tambah Kegiatan
-						</button>
-					</div>
+					<p class="text-slate-500">Tidakada kegiatan hari ini.</p>
 				{:else}
 					{#each $eventsOnSelectedDate as e}
 						<div
@@ -476,7 +418,7 @@
 					<input
 						id="startAt"
 						name="startAt"
-						type="time"
+						type="startAt"
 						class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 dark:border-slate-800 dark:bg-slate-900"
 					/>
 					{#if $resultStore?.data?.field === '/startAt'}
@@ -488,7 +430,7 @@
 					<input
 						id="endAt"
 						name="endAt"
-						type="time"
+						type="startAt"
 						class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 dark:border-slate-800 dark:bg-slate-900"
 					/>
 					{#if $resultStore?.data?.field === '/endAt'}

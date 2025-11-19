@@ -153,5 +153,35 @@ export const actions = {
 		}
 
 		return deletedRole;
+	},
+	getLocation: async ({ request, cookies }) => {
+		const formData = await request.formData();
+		const latitude = formData.get('latitude');
+		const longitude = formData.get('longitude');
+
+		if (!latitude || !longitude) {
+			return error(400, 'Missing coordinates');
+		}
+
+		const response = await fetch(
+			`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+		);
+
+		if (!response.ok) {
+			return error(500, 'Failed to fetch location');
+		}
+
+		const data = await response.json();
+
+		cookies.set('location', JSON.stringify(data), {
+			httpOnly: true,
+			sameSite: 'none',
+			secure: true,
+			partitioned: false,
+			maxAge: 60 * 60 * 24 * 7, // 7 days
+			path: '/'
+		});
+
+		return data;
 	}
 };
